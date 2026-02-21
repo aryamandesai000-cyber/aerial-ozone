@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aerial Initiation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy: #0F172A;
+  --charcoal: #111111;
+  --gold: #C6A75E;
+  --gold-light: #E7D28D;
+  --mauve: #BFA2DB;
+  --teal: #5FA8A0;
+  --ivory: #F8F6F2;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--navy);
+  color: white;
+  overflow-x: hidden;
+}
+
+section {
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:40px;
+}
+
+h1, h2 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom:20px;
+}
+
+button {
+  padding:12px 28px;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  border-radius:30px;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  color:#111;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow:0 8px 20px rgba(198,167,94,0.4);
+}
+
+.hidden { display:none; }
+
+.fade-in {
+  animation: fade 1.5s ease forwards;
+}
+
+@keyframes fade {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.path-container {
+  display:flex;
+  gap:40px;
+  margin-top:30px;
+}
+
+.path {
+  background: var(--charcoal);
+  padding:40px;
+  border-radius:20px;
+  transition:0.4s ease;
+  cursor:pointer;
+  width:220px;
+}
+
+.path:hover {
+  background: var(--mauve);
+  color:#111;
+}
+
+.quiz-option {
+  margin:10px;
+  padding:10px 20px;
+  border:1px solid var(--gold);
+  border-radius:20px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.quiz-option:hover {
+  background: var(--gold);
+  color:#111;
+}
+
+#countdown {
+  font-size:28px;
+  margin-top:20px;
+  letter-spacing:2px;
+}
+
+.progress-container {
+  width:80%;
+  background:#333;
+  border-radius:20px;
+  margin-top:20px;
+}
+
+.progress-bar {
+  height:20px;
+  width:0%;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  border-radius:20px;
+  transition: width 0.5s ease;
+}
+
+footer {
+  background: var(--charcoal);
+  padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LANDING -->
+<section id="landing">
+  <h1 class="fade-in">Your body remembers how to fly.</h1>
+  <h2 class="fade-in">We just help you rise.</h2>
+  <button onclick="scrollToSection('choose')">ENTER THE SKY</button>
+</section>
+
+<!-- CHOOSE PATH -->
+<section id="choose">
+  <h1>Choose Your Path</h1>
+  <div class="path-container">
+    <div class="path" onclick="startQuiz('kids')">Little Flyers</div>
+    <div class="path" onclick="startQuiz('adults')">Sky Seekers</div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="hidden">
+  <h1 id="quiz-question"></h1>
+  <div id="quiz-options"></div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown-section">
+  <h1>Flight Begins In</h1>
+  <div id="countdown"></div>
+</section>
+
+<!-- CHALLENGE -->
+<section id="challenge">
+  <h1>The Initiation Begins</h1>
+  <button onclick="completeTask()">Complete Challenge</button>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+</section>
+
+<footer>
+  Aerial Academy © 2026
+</footer>
+
+<script>
+
+function scrollToSection(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+let quizData = {
+  kids: {
+    question: "If you could fly like...",
+    options: ["A Fairy", "A Superhero", "A Ninja", "A Star"]
+  },
+  adults: {
+    question: "When you move, you feel most alive when...",
+    options: ["Flowing", "Holding strength", "Spinning", "Stretching"]
+  }
+};
+
+function startQuiz(type){
+  document.getElementById('quiz').classList.remove('hidden');
+  document.getElementById('quiz-question').innerText = quizData[type].question;
+  
+  let optionsHTML = "";
+  quizData[type].options.forEach(opt => {
+    optionsHTML += `<div class="quiz-option" onclick="showResult('${opt}')">${opt}</div>`;
+  });
+  document.getElementById('quiz-options').innerHTML = optionsHTML;
+
+  scrollToSection('quiz');
+}
+
+function showResult(answer){
+  document.getElementById('quiz-question').innerText = "You are destined to rise.";
+  document.getElementById('quiz-options').innerHTML = `<p>Your spirit aligns with: <strong>${answer}</strong></p>`;
+}
+
+let launchDate = new Date("March 15, 2026 10:00:00").getTime();
+
+setInterval(function(){
+  let now = new Date().getTime();
+  let distance = launchDate - now;
+
+  let days = Math.floor(distance / (1000*60*60*24));
+  let hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+  let minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+
+  document.getElementById("countdown").innerHTML =
+  days + " Days " + hours + " Hours " + minutes + " Minutes";
+},1000);
+
+let progress = 0;
+function completeTask(){
+  if(progress < 100){
+    progress += 33;
+    document.getElementById("progress").style.width = progress + "%";
+  }
+}
+
+</script>
+
+</body>
+</html>
