@@ -3,32 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aerial Initiation</title>
+<title>Aerial Initiation | Are You Ready To Fly?</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --navy: #0F172A;
-  --charcoal: #111111;
-  --gold: #C6A75E;
-  --gold-light: #E7D28D;
-  --mauve: #BFA2DB;
-  --teal: #5FA8A0;
-  --ivory: #F8F6F2;
+  --navy:#0F172A;
+  --charcoal:#111;
+  --gold:#C6A75E;
+  --gold-light:#E7D28D;
+  --mauve:#BFA2DB;
+  --teal:#5FA8A0;
+  --ivory:#F8F6F2;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--navy);
-  color: white;
-  overflow-x: hidden;
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--navy);
+  color:white;
+  overflow-x:hidden;
 }
 
-section {
-  min-height: 100vh;
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:-1;
+}
+
+section{
+  min-height:100vh;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -37,95 +44,89 @@ section {
   padding:40px;
 }
 
-h1, h2 {
-  font-family: 'Playfair Display', serif;
+h1,h2{
+  font-family:'Playfair Display',serif;
   margin-bottom:20px;
 }
 
-button {
+button{
   padding:12px 28px;
   border:none;
-  cursor:pointer;
-  font-size:16px;
   border-radius:30px;
-  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  cursor:pointer;
+  background:linear-gradient(45deg,var(--gold),var(--gold-light));
   color:#111;
-  transition: 0.3s ease;
+  transition:0.3s;
+  margin:10px;
 }
 
-button:hover {
-  transform: translateY(-3px);
-  box-shadow:0 8px 20px rgba(198,167,94,0.4);
+button:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 25px rgba(198,167,94,0.5);
 }
 
-.hidden { display:none; }
-
-.fade-in {
-  animation: fade 1.5s ease forwards;
-}
-
-@keyframes fade {
-  from { opacity:0; transform:translateY(20px); }
-  to { opacity:1; transform:translateY(0); }
-}
-
-.path-container {
+.path-container{
   display:flex;
   gap:40px;
   margin-top:30px;
 }
 
-.path {
-  background: var(--charcoal);
+.path{
+  background:var(--charcoal);
   padding:40px;
   border-radius:20px;
-  transition:0.4s ease;
-  cursor:pointer;
   width:220px;
+  cursor:pointer;
+  transition:0.4s;
 }
 
-.path:hover {
-  background: var(--mauve);
+.path:hover{
+  background:var(--mauve);
   color:#111;
 }
 
-.quiz-option {
+.quiz-option{
   margin:10px;
   padding:10px 20px;
   border:1px solid var(--gold);
   border-radius:20px;
   cursor:pointer;
-  transition:0.3s;
 }
 
-.quiz-option:hover {
-  background: var(--gold);
+.quiz-option:hover{
+  background:var(--gold);
   color:#111;
 }
 
-#countdown {
-  font-size:28px;
-  margin-top:20px;
-  letter-spacing:2px;
-}
-
-.progress-container {
+.progress-container{
   width:80%;
   background:#333;
   border-radius:20px;
   margin-top:20px;
 }
 
-.progress-bar {
+.progress-bar{
   height:20px;
   width:0%;
-  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  background:linear-gradient(45deg,var(--gold),var(--gold-light));
   border-radius:20px;
-  transition: width 0.5s ease;
+  transition:0.4s;
 }
 
-footer {
-  background: var(--charcoal);
+.hidden{display:none}
+
+#countdown{
+  font-size:28px;
+  letter-spacing:2px;
+}
+
+.locked{
+  opacity:0.4;
+  pointer-events:none;
+}
+
+footer{
+  background:var(--charcoal);
   padding:20px;
 }
 </style>
@@ -133,105 +134,186 @@ footer {
 
 <body>
 
-<!-- LANDING -->
-<section id="landing">
-  <h1 class="fade-in">Your body remembers how to fly.</h1>
-  <h2 class="fade-in">We just help you rise.</h2>
-  <button onclick="scrollToSection('choose')">ENTER THE SKY</button>
+<canvas id="bg"></canvas>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_9ccf4e1c4b.mp3?filename=deep-ambient-11743.mp3">
+</audio>
+
+<section>
+<h1>Your body remembers how to fly.</h1>
+<h2 id="dailyMessage"></h2>
+<button onclick="enterSite()">ENTER THE SKY</button>
+<button onclick="toggleMusic()">Toggle Sound</button>
 </section>
 
-<!-- CHOOSE PATH -->
-<section id="choose">
-  <h1>Choose Your Path</h1>
-  <div class="path-container">
-    <div class="path" onclick="startQuiz('kids')">Little Flyers</div>
-    <div class="path" onclick="startQuiz('adults')">Sky Seekers</div>
-  </div>
+<section id="choose" class="hidden">
+<h1>Choose Your Path</h1>
+<div class="path-container">
+<div class="path" onclick="startQuiz('kids')">Little Flyers</div>
+<div class="path" onclick="startQuiz('adults')">Sky Seekers</div>
+</div>
 </section>
 
-<!-- QUIZ -->
 <section id="quiz" class="hidden">
-  <h1 id="quiz-question"></h1>
-  <div id="quiz-options"></div>
+<h1 id="quizQ"></h1>
+<div id="quizOptions"></div>
 </section>
 
-<!-- COUNTDOWN -->
-<section id="countdown-section">
-  <h1>Flight Begins In</h1>
-  <div id="countdown"></div>
+<section id="countdownSec">
+<h1>Flight Begins In</h1>
+<div id="countdown"></div>
+<p>Only 20 Spots Available</p>
 </section>
 
-<!-- CHALLENGE -->
-<section id="challenge">
-  <h1>The Initiation Begins</h1>
-  <button onclick="completeTask()">Complete Challenge</button>
-  <div class="progress-container">
-    <div class="progress-bar" id="progress"></div>
-  </div>
+<section id="challengeSec">
+<h1>The Initiation Begins</h1>
+<button onclick="completeTask()">Complete Weekly Challenge</button>
+<div class="progress-container">
+<div class="progress-bar" id="progress"></div>
+</div>
+<h2 id="elite" class="locked">Elite Sky Circle (Locked)</h2>
 </section>
 
 <footer>
-  Aerial Academy © 2026
+Aerial Academy © 2026 | Mumbai
 </footer>
 
 <script>
 
-function scrollToSection(id){
-  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+/* DAILY MESSAGE ROTATOR */
+let messages=[
+"Strength is waking.",
+"Fear will shake.",
+"Your grip will burn.",
+"The silk will test you.",
+"You will rise."
+];
+let dayIndex=new Date().getDate()%messages.length;
+document.getElementById("dailyMessage").innerText=messages[dayIndex];
+
+/* ENTER */
+function enterSite(){
+document.getElementById("choose").classList.remove("hidden");
+window.scrollTo({top:window.innerHeight,behavior:"smooth"});
 }
 
-let quizData = {
-  kids: {
-    question: "If you could fly like...",
-    options: ["A Fairy", "A Superhero", "A Ninja", "A Star"]
-  },
-  adults: {
-    question: "When you move, you feel most alive when...",
-    options: ["Flowing", "Holding strength", "Spinning", "Stretching"]
-  }
+/* MUSIC */
+function toggleMusic(){
+let music=document.getElementById("bgMusic");
+music.paused?music.play():music.pause();
+}
+
+/* QUIZ */
+let quizData={
+kids:[
+{q:"If you could fly like...",o:["A Fairy","A Superhero","A Ninja","A Star"]},
+{q:"What makes you brave?",o:["Trying new things","Climbing high","Performing","Learning tricks"]}
+],
+adults:[
+{q:"What scares you more?",o:["Falling","Being seen","Losing control","Not trying"]},
+{q:"When you move you feel alive when...",o:["Flowing","Holding strength","Spinning","Stretching"]}
+]
 };
 
+let quizStep=0,quizType="";
+
 function startQuiz(type){
-  document.getElementById('quiz').classList.remove('hidden');
-  document.getElementById('quiz-question').innerText = quizData[type].question;
-  
-  let optionsHTML = "";
-  quizData[type].options.forEach(opt => {
-    optionsHTML += `<div class="quiz-option" onclick="showResult('${opt}')">${opt}</div>`;
-  });
-  document.getElementById('quiz-options').innerHTML = optionsHTML;
-
-  scrollToSection('quiz');
+quizType=type;
+quizStep=0;
+document.getElementById("quiz").classList.remove("hidden");
+loadQuestion();
+window.scrollTo({top:window.innerHeight*2,behavior:"smooth"});
 }
 
-function showResult(answer){
-  document.getElementById('quiz-question').innerText = "You are destined to rise.";
-  document.getElementById('quiz-options').innerHTML = `<p>Your spirit aligns with: <strong>${answer}</strong></p>`;
+function loadQuestion(){
+let data=quizData[quizType][quizStep];
+document.getElementById("quizQ").innerText=data.q;
+let options="";
+data.o.forEach(opt=>{
+options+=`<div class="quiz-option" onclick="nextQuiz()">${opt}</div>`;
+});
+document.getElementById("quizOptions").innerHTML=options;
 }
 
-let launchDate = new Date("March 15, 2026 10:00:00").getTime();
+function nextQuiz(){
+quizStep++;
+if(quizStep<quizData[quizType].length){
+loadQuestion();
+}else{
+document.getElementById("quizQ").innerText="You Are Ready To Rise.";
+document.getElementById("quizOptions").innerHTML="<p>Prepare yourself. Flight begins soon.</p>";
+}
+}
 
-setInterval(function(){
-  let now = new Date().getTime();
-  let distance = launchDate - now;
-
-  let days = Math.floor(distance / (1000*60*60*24));
-  let hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
-  let minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
-
-  document.getElementById("countdown").innerHTML =
-  days + " Days " + hours + " Hours " + minutes + " Minutes";
+/* COUNTDOWN */
+let launch=new Date("March 30, 2026 10:00:00").getTime();
+setInterval(()=>{
+let now=new Date().getTime();
+let dist=launch-now;
+let d=Math.floor(dist/(1000*60*60*24));
+let h=Math.floor((dist%(1000*60*60*24))/(1000*60*60));
+let m=Math.floor((dist%(1000*60*60))/(1000*60));
+document.getElementById("countdown").innerText=d+" Days "+h+" Hours "+m+" Minutes";
 },1000);
 
-let progress = 0;
+/* PROGRESS + ELITE UNLOCK */
+let progress=0;
 function completeTask(){
-  if(progress < 100){
-    progress += 33;
-    document.getElementById("progress").style.width = progress + "%";
-  }
+if(progress<100){
+progress+=34;
+document.getElementById("progress").style.width=progress+"%";
+}
+if(progress>=100){
+document.getElementById("elite").classList.remove("locked");
+document.getElementById("elite").innerText="Elite Sky Circle Unlocked";
+}
 }
 
-</script>
+/* FLOATING PARTICLES BACKGROUND */
+let canvas=document.getElementById("bg");
+let ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
+let particles=[];
+for(let i=0;i<60;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*3+1,
+d:Math.random()*1
+});
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="rgba(198,167,94,0.6)";
+ctx.beginPath();
+for(let i=0;i<particles.length;i++){
+let p=particles[i];
+ctx.moveTo(p.x,p.y);
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);
+}
+ctx.fill();
+update();
+}
+
+let angle=0;
+function update(){
+angle+=0.01;
+for(let i=0;i<particles.length;i++){
+let p=particles[i];
+p.y+=Math.cos(angle+p.d)+1;
+p.x+=Math.sin(angle)*0.5;
+if(p.y>canvas.height){
+particles[i]={x:Math.random()*canvas.width,y:0,r:p.r,d:p.d};
+}
+}
+}
+
+setInterval(draw,33);
+
+</script>
 </body>
 </html>
