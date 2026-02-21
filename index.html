@@ -12,7 +12,6 @@
 --gold:#C6A75E;
 --navy:#0F172A;
 --mauve:#BFA2DB;
---teal:#5FA8A0;
 }
 
 body{
@@ -22,7 +21,7 @@ background:linear-gradient(-45deg,#0F172A,#111,#1a1a2e,#0F172A);
 background-size:400% 400%;
 animation:gradientShift 15s ease infinite;
 color:white;
-overflow-x:hidden;
+overflow:hidden;
 }
 
 @keyframes gradientShift{
@@ -39,7 +38,6 @@ justify-content:center;
 align-items:center;
 text-align:center;
 padding:40px;
-position:relative;
 }
 
 h1{
@@ -103,18 +101,9 @@ margin-top:10px;
 color:var(--gold);
 }
 
-.float{
-position:absolute;
-width:6px;
-height:200px;
-background:linear-gradient(var(--mauve),transparent);
-animation:sway 4s ease-in-out infinite alternate;
-opacity:0.3;
-}
-
-@keyframes sway{
-from{transform:translateY(-20px)}
-to{transform:translateY(20px)}
+@keyframes glow {
+from { text-shadow: 0 0 10px gold; }
+to { text-shadow: 0 0 30px #E7D28D; }
 }
 
 </style>
@@ -122,11 +111,8 @@ to{transform:translateY(20px)}
 
 <body>
 
-<div class="float" style="left:10%"></div>
-<div class="float" style="left:80%;animation-delay:1s"></div>
-
 <section id="intro">
-<h1 id="typeText"></h1>
+<h1>Your body remembers how to fly.</h1>
 <button onclick="startGame()">ENTER THE SKY</button>
 </section>
 
@@ -147,26 +133,17 @@ to{transform:translateY(20px)}
 </section>
 
 <section id="elite" class="hidden">
-<h1>ELITE SKY CIRCLE UNLOCKED</h1>
-<p>You completed the initiation.</p>
-<button onclick="launchConfetti()">Celebrate</button>
+<h1 style="animation: glow 2s infinite alternate;">
+SEE YOU IN MARCH
+</h1>
+<h2 id="finalCountdown"></h2>
+<p style="margin-top:20px;opacity:0.8;">
+The sky opens soon. Prepare to rise.
+</p>
 </section>
 
 <script>
 
-/* TYPEWRITER INTRO */
-let text="Your body remembers how to fly.";
-let i=0;
-function typeWriter(){
-if(i<text.length){
-document.getElementById("typeText").innerHTML+=text.charAt(i);
-i++;
-setTimeout(typeWriter,50);
-}
-}
-typeWriter();
-
-/* GAME STATE */
 let xp=0;
 let progress=0;
 let current=0;
@@ -193,6 +170,7 @@ document.getElementById("lobby").classList.remove("hidden");
 
 function selectPath(p){
 path=p;
+current=0;
 document.getElementById("lobby").classList.add("hidden");
 document.getElementById("game").classList.remove("hidden");
 loadChallenge();
@@ -200,6 +178,7 @@ loadChallenge();
 
 function loadChallenge(){
 let list=path==="Kids"?kidsChallenges:adultChallenges;
+
 if(current<list.length){
 document.getElementById("challengeTitle").innerText="Mission "+(current+1);
 document.getElementById("challengeArea").innerHTML=
@@ -212,8 +191,15 @@ unlockElite();
 function completeMission(){
 xp+=25;
 progress+=25;
+
 document.getElementById("xp").innerText="XP: "+xp;
 document.getElementById("bar").style.width=progress+"%";
+
+fireworkBurst();
+
+if(progress>=100){
+setTimeout(unlockElite,800);
+}
 }
 
 function nextChallenge(){
@@ -226,28 +212,56 @@ document.getElementById("game").classList.add("hidden");
 document.getElementById("elite").classList.remove("hidden");
 }
 
-function launchConfetti(){
-for(let i=0;i<100;i++){
-let conf=document.createElement("div");
-conf.style.position="fixed";
-conf.style.width="5px";
-conf.style.height="5px";
-conf.style.background="gold";
-conf.style.left=Math.random()*window.innerWidth+"px";
-conf.style.top="-10px";
-conf.style.animation="fall 2s linear";
-document.body.appendChild(conf);
-setTimeout(()=>conf.remove(),2000);
+/* FIREWORK BURST */
+function fireworkBurst(){
+let centerX=window.innerWidth/2;
+let centerY=window.innerHeight/2;
+
+for(let i=0;i<40;i++){
+let particle=document.createElement("div");
+particle.style.position="fixed";
+particle.style.width="6px";
+particle.style.height="6px";
+particle.style.borderRadius="50%";
+particle.style.background="gold";
+particle.style.left=centerX+"px";
+particle.style.top=centerY+"px";
+particle.style.pointerEvents="none";
+
+let angle=Math.random()*2*Math.PI;
+let distance=Math.random()*200+50;
+
+particle.animate([
+{transform:"translate(0,0)",opacity:1},
+{transform:`translate(${Math.cos(angle)*distance}px,${Math.sin(angle)*distance}px)`,opacity:0}
+],{
+duration:1000,
+easing:"ease-out"
+});
+
+document.body.appendChild(particle);
+setTimeout(()=>particle.remove(),1000);
 }
 }
+
+/* FINAL COUNTDOWN */
+let marchLaunch=new Date("March 30, 2026 10:00:00").getTime();
+
+setInterval(function(){
+let now=new Date().getTime();
+let distance=marchLaunch-now;
+
+let days=Math.floor(distance/(1000*60*60*24));
+let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60));
+let minutes=Math.floor((distance%(1000*60*60))/(1000*60));
+
+if(document.getElementById("finalCountdown")){
+document.getElementById("finalCountdown").innerHTML=
+days+" Days "+hours+" Hours "+minutes+" Minutes";
+}
+},1000);
 
 </script>
-
-<style>
-@keyframes fall{
-to{transform:translateY(100vh);opacity:0}
-}
-</style>
 
 </body>
 </html>
